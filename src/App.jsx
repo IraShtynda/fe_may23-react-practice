@@ -18,7 +18,11 @@ const products = productsFromServer.map((product) => {
   };
 });
 
-const getFilteredProduct = (product, selectedUser, query) => {
+const getPreparedProduct = (product, {
+  selectedUser,
+  query,
+  selectedCategories,
+}) => {
   let filteredProduct = [...product];
   const normalizedQuery = query.toLowerCase().trim();
 
@@ -32,17 +36,41 @@ const getFilteredProduct = (product, selectedUser, query) => {
       .filter(prod => prod.name.toLowerCase().includes(normalizedQuery));
   }
 
+  if (selectedCategories.length > 0) {
+    filteredProduct = filteredProduct
+      .filter(prod => selectedCategories.includes(prod.categoryId));
+  }
+
   return filteredProduct;
 };
 
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [query, setQuery] = useState('');
-  const visibleProduct = getFilteredProduct(products, selectedUser, query);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const visibleProduct = getPreparedProduct(products, {
+    selectedUser,
+    query,
+    selectedCategories,
+  });
 
   const reset = () => {
     setQuery('');
     setSelectedUser(null);
+    setSelectedCategories([]);
+  };
+
+  const selectCategory = (category) => {
+    setSelectedCategories((prevSelectedCategories) => {
+      if (prevSelectedCategories.includes(category.id)) {
+        return prevSelectedCategories.filter(
+          id => id !== category.id,
+        );
+      }
+
+      return [...prevSelectedCategories, category.id];
+    });
   };
 
   return (
@@ -109,15 +137,24 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={cn(
+                  'button mr-2 my-1 is-success',
+                  { 'is-outlined': selectedCategories.length },
+                )}
+                onClick={() => setSelectedCategories([])}
               >
                 All
               </a>
               {categoriesFromServer.map(category => (
                 <a
+                  key={category.id}
                   data-cy="Category"
-                  className="button mr-2 my-1"
+                  className={cn(
+                    'button mr-2 my-1',
+                    { 'is-info': selectedCategories.includes(category.id) },
+                  )}
                   href="#/"
+                  onClick={() => selectCategory(category)}
                 >
                   {category.title}
                 </a>
@@ -202,7 +239,7 @@ export const App = () => {
 
               <tbody>
                 {visibleProduct.map(product => (
-                  <tr data-cy="Product">
+                  <tr data-cy="Product" key={product.id}>
                     <td className="has-text-weight-bold" data-cy="ProductId">
                       {product.id}
                     </td>
