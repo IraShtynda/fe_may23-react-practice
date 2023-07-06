@@ -18,7 +18,7 @@ const products = productsFromServer.map((product) => {
   };
 });
 
-function getFilteredProduct(product, selectedUser, query) {
+const getFilteredProduct = (product, selectedUser, query) => {
   let filteredProduct = [...product];
   const normalizedQuery = query.toLowerCase().trim();
 
@@ -33,7 +33,7 @@ function getFilteredProduct(product, selectedUser, query) {
   }
 
   return filteredProduct;
-}
+};
 
 export const App = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -113,37 +113,16 @@ export const App = () => {
               >
                 All
               </a>
+              {categoriesFromServer.map(category => (
+                <a
+                  data-cy="Category"
+                  className="button mr-2 my-1"
+                  href="#/"
+                >
+                  {category.title}
+                </a>
+              ))}
 
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 1
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 2
-              </a>
-
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1 is-info"
-                href="#/"
-              >
-                Category 3
-              </a>
-              <a
-                data-cy="Category"
-                className="button mr-2 my-1"
-                href="#/"
-              >
-                Category 4
-              </a>
             </div>
 
             <div className="panel-block">
